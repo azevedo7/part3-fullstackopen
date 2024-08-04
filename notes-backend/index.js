@@ -1,25 +1,39 @@
 const express = require('express')
 const app = express()
 
-app.use(express.json())
 
 let notes = [
-  {
-    id: "1",
-    content: "HTML is easy",
-    important: true
-  },
-  {
-    id: "2",
-    content: "Browser can execute only JavaScript",
-    important: false
-  },
-  {
-    id: "3",
-    content: "GET and POST are the most important methods of HTTP protocol",
-    important: true
-  }
+    {
+        id: "1",
+        content: "HTML is easy",
+        important: true
+    },
+    {
+        id: "2",
+        content: "Browser can execute only JavaScript",
+        important: false
+    },
+    {
+        id: "3",
+        content: "GET and POST are the most important methods of HTTP protocol",
+        important: true
+    }
 ]
+
+const requestLogger = (req, res, next) => {
+    console.log('Method:', req.method)
+    console.log('Path:', req.path)
+    console.log('Body:', req.body)
+    console.log('---')
+    next()
+}
+
+app.use(express.json())
+app.use(requestLogger)
+
+const unknownEndpoint = (req, res) => {
+    res.status(404).send({error: 'unknown endpoint'})
+}
 
 app.get('/', (req, res) => {
     res.send('<h1>Hello world</h1>')
@@ -69,7 +83,7 @@ app.post('/api/notes', (req, res) => {
 })
 
 // deleting resources
-app.delete('/api/notes/:id', (req, res) => {
+!app.delete('/api/notes/:id', (req, res) => {
     const id = req.params.id
     notes = notes.filter(note => note.id !== id)
 
